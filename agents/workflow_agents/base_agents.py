@@ -7,31 +7,34 @@ import uuid
 from datetime import datetime
 from openai import OpenAI
 
-
-# DirectPromptAgent class definition
-class DirectPromptAgent:
-    
+class BaseAgent:
     def __init__(self, openai_api_key):
         self.openai_api_key = openai_api_key
-
-    def respond(self, input, model="gpt-3.5-turbo"):
-        # Generate a response using the OpenAI API
+        
+    def get_response(self, input, instructions=None, model="gpt-3.5-turbo"):     # Generate a response using the OpenAI API
         client = OpenAI(api_key=self.openai_api_key)
         try:
             if model != "gpt-5":
                 response = client.responses.create(
                     model=model,
+                    instructions=instructions,
                     input=input
                 )
             else:
                 response = client.responses.create(
                     model=model,
                     input=input,
+                    instructions=instructions,
                     temperature=0
                 )
             return response.output_text
         except Exception as e:
             print(f"Response failed: {e}")
+
+# DirectPromptAgent class definition
+class DirectPromptAgent(BaseAgent):
+        def __init__(self, openai_api_key):
+            super().__init__(openai_api_key)
 
         
 '''

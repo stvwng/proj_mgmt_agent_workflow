@@ -11,7 +11,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 input = "What is the Capital of France?"
 
 direct_agent = base_agents.DirectPromptAgent(OPENAI_API_KEY)
-direct_agent_response = direct_agent.respond(input)
+direct_agent_response = direct_agent.get_response(input)
 
 print(direct_agent_response)
 print("Agent generated the response using general knowledge from the LLM.")
