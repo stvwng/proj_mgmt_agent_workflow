@@ -7,60 +7,30 @@ import uuid
 from datetime import datetime
 from openai import OpenAI
 
-class BaseAgent:
-    def __init__(self, openai_api_key):
+class PromptAgent:
+    def __init__(self, openai_api_key, instructions=None):
         self.openai_api_key = openai_api_key
+        self.instructions = instructions
         
-    def get_response(self, input, instructions=None, model="gpt-3.5-turbo"):     # Generate a response using the OpenAI API
+    def get_response_text(self, input, model="gpt-3.5-turbo"):     # Generate a response using the OpenAI API
         client = OpenAI(api_key=self.openai_api_key)
         try:
             if model != "gpt-5":
                 response = client.responses.create(
                     model=model,
-                    instructions=instructions,
+                    instructions=self.instructions,
                     input=input
                 )
             else:
                 response = client.responses.create(
                     model=model,
                     input=input,
-                    instructions=instructions,
+                    instructions=self.instructions,
                     temperature=0
                 )
             return response.output_text
         except Exception as e:
             print(f"Response failed: {e}")
-
-# DirectPromptAgent class definition
-class DirectPromptAgent(BaseAgent):
-        def __init__(self, openai_api_key):
-            super().__init__(openai_api_key)
-
-        
-'''
-# AugmentedPromptAgent class definition
-class AugmentedPromptAgent:
-    def __init__(self, openai_api_key, persona):
-        """Initialize the agent with given attributes."""
-        # TODO: 1 - Create an attribute for the agent's persona
-        self.openai_api_key = openai_api_key
-
-    def respond(self, input_text):
-        """Generate a response using OpenAI API."""
-        client = OpenAI(api_key=self.openai_api_key)
-
-        # TODO: 2 - Declare a variable 'response' that calls OpenAI's API for a chat completion.
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                # TODO: 3 - Add a system prompt instructing the agent to assume the defined persona and explicitly forget previous context.
-                {"role": "user", "content": input_text}
-            ],
-            temperature=0
-        )
-
-        return  # TODO: 4 - Return only the textual content of the response, not the full JSON payload.
-'''
 
 '''
 # KnowledgeAugmentedPromptAgent class definition
