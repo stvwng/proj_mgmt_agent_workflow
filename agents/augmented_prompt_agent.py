@@ -1,23 +1,17 @@
-# TODO: 1 - Import the AugmentedPromptAgent class
 import os
 from dotenv import load_dotenv
+from workflow_agents import base_agents
 
-# Load environment variables from .env file
 load_dotenv()
-
-# Retrieve OpenAI API key from environment variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-prompt = "What is the capital of France?"
-persona = "You are a college professor; your answers always start with: 'Dear students,'"
+input = "What is the capital of France?"
+instructions = "You are a college professor; your answers always start with: 'Dear students,'"
 
-# TODO: 2 - Instantiate an object of AugmentedPromptAgent with the required parameters
-
-# TODO: 3 - Send the 'prompt' to the agent and store the response in a variable named 'augmented_agent_response'
-
-# Print the agent's response
+augmented_prompt_agent = base_agents.PromptAgent(openai_api_key, instructions)
+augmented_agent_response = augmented_prompt_agent.get_response_text(input)
 print(augmented_agent_response)
 
-# TODO: 4 - Add a comment explaining:
-# - What knowledge the agent likely used to answer the prompt.
-# - How the system prompt specifying the persona affected the agent's response.
+# The agent used the LLM's knowledge to answer the prompt. The instructions modified the answer's format.
+# While the instructions assigned a role to the LLM, I don't believe that it affected the substance of the response here,
+# as the answer is common knowledge.
