@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime
 from openai import OpenAI
 
-class PromptAgent:
+class BaseAgent:
     def __init__(self, openai_api_key, instructions=None):
         self.openai_api_key = openai_api_key
         self.instructions = instructions
@@ -33,7 +33,7 @@ class PromptAgent:
             print(f"Response failed: {e}")
 
 # KnowledgeAugmentedPromptAgent class definition
-class KnowledgeAugmentedPromptAgent(PromptAgent):
+class KnowledgeAugmentedPromptAgent(BaseAgent):
     def __init__(self, openai_api_key, knowledge, instructions="You are a knowledge-based assistant."):
         augmented_instructions = f"""
         {instructions} 
@@ -181,11 +181,13 @@ class RAGKnowledgePromptAgent:
         return response.choices[0].message.content
 
 '''
-class EvaluationAgent:
+class EvaluationAgent(BaseAgent):
     
-    def __init__(self, openai_api_key, persona, evaluation_criteria, worker_agent, max_interactions):
-        # Initialize the EvaluationAgent with given attributes.
-        # TODO: 1 - Declare class attributes here
+    def __init__(self, openai_api_key, instructions, evaluation_criteria, worker_agent, max_interactions):
+        super().__init__(openai_api_key, instructions)
+        self.evaluation_criteria = evaluation_criteria
+        self.worker_agent = worker_agent
+        self.max_interactions = max_interactions
 
     def evaluate(self, initial_prompt):
         # This method manages interactions between agents to achieve a solution.
