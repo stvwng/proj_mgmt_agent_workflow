@@ -1,4 +1,4 @@
-from workflow_agents import base_agents
+from agents import base_agents
 from openai import OpenAI
 
 openai_instance = OpenAI()

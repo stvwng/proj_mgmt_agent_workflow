@@ -1,5 +1,5 @@
 from openai import OpenAI
-from workflow_agents import base_agents
+from agents import base_agents
 
 openai_instance = OpenAI()
 input = "What is the capital of France?"

@@ -1,6 +1,6 @@
 # agentic_workflow.py
 
-from agents.workflow_agents.base_agents import ActionPlanningAgent, KnowledgeAugmentedPromptAgent, EvaluationAgent, RoutingAgent
+from agents.base_agents import ActionPlanningAgent, KnowledgeAugmentedPromptAgent, EvaluationAgent, RoutingAgent
 from openai import OpenAI
 
 openai_instance = OpenAI()

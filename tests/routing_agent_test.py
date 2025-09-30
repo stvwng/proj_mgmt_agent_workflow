@@ -1,6 +1,6 @@
 
 from openai import OpenAI
-from workflow_agents.base_agents import KnowledgeAugmentedPromptAgent, RoutingAgent
+from agents.base_agents import KnowledgeAugmentedPromptAgent, RoutingAgent
 
 openai_instance = OpenAI()
 

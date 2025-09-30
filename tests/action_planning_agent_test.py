@@ -1,5 +1,5 @@
 from openai import OpenAI
-from workflow_agents.base_agents import ActionPlanningAgent
+from ..agents.base_agents import ActionPlanningAgent
 
 openai_instance = OpenAI()
 
