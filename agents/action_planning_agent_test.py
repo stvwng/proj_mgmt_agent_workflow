@@ -1,5 +1,5 @@
 from openai import OpenAI
-from agent_classes import planning_agent
+from agent_classes.action_planning_agent import ActionPlanningAgent
 
 # agent_classes import ActionPlanningAgent
 
@@ -33,7 +33,7 @@ knowledge = """
 7. Peel and serve
 """
 
-planning_agent = planning_agent.ActionPlanningAgent(openai_instance, knowledge)
+planning_agent = ActionPlanningAgent(openai_instance, knowledge)
 
 input = "One morning I wanted to have scrambled eggs"
 

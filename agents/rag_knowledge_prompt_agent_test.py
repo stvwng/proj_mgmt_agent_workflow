@@ -1,4 +1,4 @@
-from agents.base_agents import RAGKnowledgePromptAgent
+from agent_classes.rag_knowledge_prompt_agent import RAGKnowledgePromptAgent
 import os
 from dotenv import load_dotenv
 

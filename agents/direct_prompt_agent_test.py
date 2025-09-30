@@ -1,11 +1,11 @@
 from openai import OpenAI
-from agents import base_agents
+from agent_classes.base_agent import BaseAgent
 
 openai_instance = OpenAI()
 
 input = "What is the Capital of France?"
 
-direct_prompt_agent = base_agents.BaseAgent(openai_instance)
+direct_prompt_agent = BaseAgent(openai_instance)
 direct_agent_response = direct_prompt_agent.get_response_text(input)
 
 print(direct_agent_response)
