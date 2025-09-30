@@ -1,23 +1,20 @@
 
-import os
-from dotenv import load_dotenv
+from openai import OpenAI
 from workflow_agents.base_agents import KnowledgeAugmentedPromptAgent, RoutingAgent
 
-load_dotenv()
-
-openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_instance = OpenAI()
 
 general_knowledge_agent_instructions = "You are a college professor"
 
 texas_knowledge = "You know everything about Texas"
-texas_agent = KnowledgeAugmentedPromptAgent(openai_api_key, texas_knowledge, general_knowledge_agent_instructions)
+texas_agent = KnowledgeAugmentedPromptAgent(openai_instance, texas_knowledge, general_knowledge_agent_instructions)
 
 europe_knowledge = "You know everything about Europe"
-europe_agent = KnowledgeAugmentedPromptAgent(openai_api_key, europe_knowledge, general_knowledge_agent_instructions)
+europe_agent = KnowledgeAugmentedPromptAgent(openai_instance, europe_knowledge, general_knowledge_agent_instructions)
 
 math_agent_instructions = "You are a college math professor"
 math_knowledge = "You know everything about math, you take prompts with numbers, extract math formulas, and show the answer without explanation"
-math_agent = KnowledgeAugmentedPromptAgent(openai_api_key, math_knowledge, math_agent_instructions)
+math_agent = KnowledgeAugmentedPromptAgent(openai_instance, math_knowledge, math_agent_instructions)
 
 agents = [
     {
@@ -37,7 +34,7 @@ agents = [
     }
 ]
 
-routing_agent = RoutingAgent(openai_api_key, agents)
+routing_agent = RoutingAgent(openai_instance, agents)
 
 inputs = [
     "Tell me about the history of Rome, Texas",

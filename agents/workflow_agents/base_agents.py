@@ -8,22 +8,21 @@ from datetime import datetime
 from openai import OpenAI
 
 class BaseAgent:
-    def __init__(self, openai_api_key, instructions=None):
-        self.openai_api_key = openai_api_key
+    def __init__(self, openai_instance, instructions=None):
+        self.openai_instance = openai_instance
         self.instructions = instructions
         self.models_without_temperature = {"gpt-5"}
         
     def get_response_text(self, input, model="gpt-3.5-turbo", temperature=0):     # Generate a response using the OpenAI API
-        client = OpenAI(api_key=self.openai_api_key)
         try:
             if model in self.models_without_temperature:
-                response = client.responses.create(
+                response = self.openai_instance.responses.create(
                     model=model,
                     instructions=self.instructions,
                     input=input
                 )
             else:
-                response = client.responses.create(
+                response = self.openai_instance.responses.create(
                     model=model,
                     input=input,
                     instructions=self.instructions,
@@ -35,7 +34,7 @@ class BaseAgent:
 
 # KnowledgeAugmentedPromptAgent class definition
 class KnowledgeAugmentedPromptAgent(BaseAgent):
-    def __init__(self, openai_api_key, knowledge, instructions="You are a knowledge-based assistant."):
+    def __init__(self, openai_instance, knowledge, instructions="You are a knowledge-based assistant."):
         augmented_instructions = f"""
         {instructions} 
         Forget all previous content.
@@ -43,7 +42,7 @@ class KnowledgeAugmentedPromptAgent(BaseAgent):
         {knowledge}
         Answer the prompt based on this knowledge, not your own.
         """
-        super().__init__(openai_api_key, augmented_instructions)
+        super().__init__(openai_instance, augmented_instructions)
         
 class RAGKnowledgePromptAgent:
     """
@@ -184,8 +183,8 @@ class RAGKnowledgePromptAgent:
 
 class EvaluationAgent(BaseAgent):
     
-    def __init__(self, openai_api_key, instructions, evaluation_criteria, worker_agent, max_interactions=5):
-        super().__init__(openai_api_key, instructions)
+    def __init__(self, openai_instance, instructions, evaluation_criteria, worker_agent, max_interactions=5):
+        super().__init__(openai_instance, instructions)
         self.evaluation_criteria = evaluation_criteria
         self.worker_agent = worker_agent
         self.max_interactions = max_interactions
@@ -193,7 +192,6 @@ class EvaluationAgent(BaseAgent):
 
     def evaluate(self, initial_input):
         # This method manages interactions between agents to achieve a solution.
-        client = OpenAI(api_key=self.openai_api_key)
         input_to_evaluate = initial_input
 
         for i in range(self.max_interactions):
@@ -241,9 +239,9 @@ class EvaluationAgent(BaseAgent):
 
 class RoutingAgent():
 
-    def __init__(self, openai_api_key, agents):
+    def __init__(self, openai_instance, agents):
         # Initialize the agent with given attributes
-        self.openai_api_key = openai_api_key
+        self.openai_instance = openai_instance
         self.agents = agents
         '''
         self.agents is a list of dicts with information about available agents.
@@ -265,8 +263,7 @@ class RoutingAgent():
         Returns:
         list: The embedding vector.
         """
-        client = OpenAI(api_key=self.openai_api_key)
-        response = client.embeddings.create(
+        response = self.openai_instance.embeddings.create(
             model="text-embedding-3-large",
             input=text,
             encoding_format="float"

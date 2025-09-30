@@ -1,14 +1,12 @@
-import os
-from dotenv import load_dotenv
 from workflow_agents import base_agents
+from openai import OpenAI
 
-load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_instance = OpenAI()
 
 input = "What is the capital of France?"
 instructions = "You are a college professor; your answers always start with: 'Dear students,'"
 
-augmented_prompt_agent = base_agents.BaseAgent(openai_api_key, instructions)
+augmented_prompt_agent = base_agents.BaseAgent(openai_instance, instructions)
 augmented_agent_response = augmented_prompt_agent.get_response_text(input)
 print(augmented_agent_response)
 

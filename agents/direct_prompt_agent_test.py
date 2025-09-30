@@ -1,16 +1,11 @@
-# Test script for DirectPromptAgent class
-
+from openai import OpenAI
 from workflow_agents import base_agents
-import os
-from dotenv import load_dotenv
 
-
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+openai_instance = OpenAI()
 
 input = "What is the Capital of France?"
 
-direct_prompt_agent = base_agents.BaseAgent(OPENAI_API_KEY)
+direct_prompt_agent = base_agents.BaseAgent(openai_instance)
 direct_agent_response = direct_prompt_agent.get_response_text(input)
 
 print(direct_agent_response)
