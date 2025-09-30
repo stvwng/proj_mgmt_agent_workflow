@@ -1,5 +1,4 @@
 
-# TODO: 1 - Import the KnowledgeAugmentedPromptAgent and RoutingAgent
 import os
 from dotenv import load_dotenv
 from workflow_agents.base_agents import KnowledgeAugmentedPromptAgent, RoutingAgent
@@ -39,11 +38,6 @@ agents = [
 ]
 
 routing_agent = RoutingAgent(openai_api_key, agents)
-
-# TODO: 8 - Print the RoutingAgent responses to the following prompts:
-#           - "Tell me about the history of Rome, Texas"
-#           - "Tell me about the history of Rome, Italy"
-#           - "One story takes 2 days, and there are 20 stories"
 
 inputs = [
     "Tell me about the history of Rome, Texas",
