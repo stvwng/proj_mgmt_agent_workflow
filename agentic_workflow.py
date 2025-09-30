@@ -132,14 +132,6 @@ routing_agent = RoutingAgent(
                     openai_instance=openai_instance,
                     agents=worker_dicts)
 
-# Job function persona support functions
-# TODO: 11 - Define the support functions for the routes of the routing agent (e.g., product_manager_support_function, program_manager_support_function, development_engineer_support_function).
-# Each support function should:
-#   1. Take the input query (e.g., a step from the action plan).
-#   2. Get a response from the respective Knowledge Augmented Prompt Agent.
-#   3. Have the response evaluated by the corresponding Evaluation Agent.
-#   4. Return the final validated response.
-
 # Run the workflow
 
 print("\n*** Workflow execution started ***\n")
@@ -150,22 +142,14 @@ workflow_input = "What would the development tasks for this product be?"
 print(f"Task to complete in this workflow, workflow prompt = {workflow_input}")
 
 print("\nDefining workflow steps from the workflow prompt")
-# TODO: 12 - Implement the workflow.
-#   1. Use the 'action_planning_agent' to extract steps from the 'workflow_prompt'.
-#   2. Initialize an empty list to store 'completed_steps'.
-#   3. Loop through the extracted workflow steps:
-#      a. For each step, use the 'routing_agent' to route the step to the appropriate support function.
-#      b. Append the result to 'completed_steps'.
-#      c. Print information about the step being executed and its result.
-#   4. After the loop, print the final output of the workflow (the last completed step).
 
 workflow_steps = action_planning_agent.extract_steps_from_input(workflow_input)
 completed_steps = []
 
 for step in workflow_steps:
-    print(f"Executing Step Number {workflow_steps.index(step)}")
+    print(f"Executing Step Number {workflow_steps.index(step) + 1}")
     step_result = routing_agent.route_prompt(step)
-    print(f"Step {workflow_steps.index(step)} Result: {step_result} \n")
+    print(f"Step {workflow_steps.index(step) + 1} Result: {step_result} \n")
     completed_steps.append(step_result)
     
 print("FINAL RESULT")

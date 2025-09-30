@@ -19,4 +19,4 @@ class KnowledgeAugmentedPromptAgent(BaseAgent):
         {knowledge}
         Answer the prompt based on this knowledge, not your own.
         """
-        super().__init__(openai_instance, augmented_instructions, name=None, description=None, func=None)
+        super().__init__(openai_instance, augmented_instructions, name, description, func)
