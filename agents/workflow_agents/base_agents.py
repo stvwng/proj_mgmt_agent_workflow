@@ -11,11 +11,12 @@ class BaseAgent:
     def __init__(self, openai_api_key, instructions=None):
         self.openai_api_key = openai_api_key
         self.instructions = instructions
+        self.models_without_temperature = {"gpt-5"}
         
-    def get_response_text(self, input, model="gpt-3.5-turbo"):     # Generate a response using the OpenAI API
+    def get_response_text(self, input, model="gpt-3.5-turbo", temperature=0):     # Generate a response using the OpenAI API
         client = OpenAI(api_key=self.openai_api_key)
         try:
-            if model != "gpt-5":
+            if model in self.models_without_temperature:
                 response = client.responses.create(
                     model=model,
                     instructions=self.instructions,
@@ -26,7 +27,7 @@ class BaseAgent:
                     model=model,
                     input=input,
                     instructions=self.instructions,
-                    temperature=0
+                    temperature=temperature
                 )
             return response.output_text
         except Exception as e:
@@ -180,68 +181,62 @@ class RAGKnowledgePromptAgent:
 
         return response.choices[0].message.content
 
-'''
 class EvaluationAgent(BaseAgent):
     
-    def __init__(self, openai_api_key, instructions, evaluation_criteria, worker_agent, max_interactions):
+    def __init__(self, openai_api_key, instructions, evaluation_criteria, worker_agent, max_interactions=5):
         super().__init__(openai_api_key, instructions)
         self.evaluation_criteria = evaluation_criteria
         self.worker_agent = worker_agent
         self.max_interactions = max_interactions
+        self.final_response_dict = dict()
 
-    def evaluate(self, initial_prompt):
+    def evaluate(self, initial_input):
         # This method manages interactions between agents to achieve a solution.
         client = OpenAI(api_key=self.openai_api_key)
-        prompt_to_evaluate = initial_prompt
+        input_to_evaluate = initial_input
 
-        for i in # TODO: 2 - Set loop to iterate up to the maximum number of interactions:
+        for i in range(self.max_interactions):
             print(f"\n--- Interaction {i+1} ---")
 
-            print(" Step 1: Worker agent generates a response to the prompt")
-            print(f"Prompt:\n{prompt_to_evaluate}")
-            response_from_worker = # TODO: 3 - Obtain a response from the worker agent
+            print(" Step 1: Worker agent generates a response to the input")
+            print(f"Prompt:\n{input_to_evaluate}")
+            response_from_worker = self.worker_agent.get_response_text(input_to_evaluate)
             print(f"Worker Agent Response:\n{response_from_worker}")
 
             print(" Step 2: Evaluator agent judges the response")
-            eval_prompt = (
+            eval_input = (
                 f"Does the following answer: {response_from_worker}\n"
-                f"Meet this criteria: "  # TODO: 4 - Insert evaluation criteria here
+                f"Meet this criteria: {self.evaluation_criteria}"
                 f"Respond Yes or No, and the reason why it does or doesn't meet the criteria."
             )
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=# TODO: 5 - Define the message structure sent to the LLM for evaluation (use temperature=0)
-            )
-            evaluation = response.choices[0].message.content.strip()
+            evaluation = self.get_response_text(eval_input)
             print(f"Evaluator Agent Evaluation:\n{evaluation}")
 
             print(" Step 3: Check if evaluation is positive")
             if evaluation.lower().startswith("yes"):
                 print("✅ Final solution accepted.")
+                self.final_response_dict = {
+                    "final_response": response_from_worker,
+                    "evaluation": evaluation,
+                    "num_iterations": i + 1
+                }
                 break
             else:
                 print(" Step 4: Generate instructions to correct the response")
-                instruction_prompt = (
+                input_to_fix_response = (
                     f"Provide instructions to fix an answer based on these reasons why it is incorrect: {evaluation}"
                 )
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=# TODO: 6 - Define the message structure sent to the LLM to generate correction instructions (use temperature=0)
-                )
-                instructions = response.choices[0].message.content.strip()
-                print(f"Instructions to fix:\n{instructions}")
+                instructions_to_fix_answer = self.get_response_text(input_to_fix_response)
+                print(f"Instructions to fix:\n{instructions_to_fix_answer}")
 
                 print(" Step 5: Send feedback to worker agent for refinement")
-                prompt_to_evaluate = (
-                    f"The original prompt was: {initial_prompt}\n"
+                input_to_evaluate = (
+                    f"The original prompt was: {initial_input}\n"
                     f"The response to that prompt was: {response_from_worker}\n"
                     f"It has been evaluated as incorrect.\n"
-                    f"Make only these corrections, do not alter content validity: {instructions}"
+                    f"Make only these corrections, do not alter content validity: {instructions_to_fix_answer}"
                 )
-        return {
-            # TODO: 7 - Return a dictionary containing the final response, evaluation, and number of iterations
-        }   
-'''
+        return self.final_response_dict
 
 '''
 class RoutingAgent():
