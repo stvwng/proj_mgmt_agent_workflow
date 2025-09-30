@@ -1,5 +1,5 @@
 # KnowledgeAugmentedPromptAgent class definition
-from base_agent import BaseAgent
+from .base_agent import BaseAgent
 from openai import OpenAI
 
 class KnowledgeAugmentedPromptAgent(BaseAgent):
