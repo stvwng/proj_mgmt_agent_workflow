@@ -294,23 +294,21 @@ class RoutingAgent():
         return best_agent["func"](user_input)
 
 
-'''
-class ActionPlanningAgent:
 
-    def __init__(self, openai_api_key, knowledge):
-        # TODO: 1 - Initialize the agent attributes here
+class ActionPlanningAgent(BaseAgent):
 
-    def extract_steps_from_prompt(self, prompt):
+    def __init__(self, openai_instance, knowledge):
+        instructions = f"""You are an action planning agent.
+        Using your knowledge, you extract from the user prompt the steps requested to complete the action the user is asking for.
+        You return the steps as a list. Only return the steps in your knowledge. 
+        Forget any previous context. This is your knowledge: {knowledge}"""
 
-        # TODO: 2 - Instantiate the OpenAI client using the provided API key
-        # TODO: 3 - Call the OpenAI API to get a response from the "gpt-3.5-turbo" model.
-        # Provide the following system prompt along with the user's prompt:
-        # "You are an action planning agent. Using your knowledge, you extract from the user prompt the steps requested to complete the action the user is asking for. You return the steps as a list. Only return the steps in your knowledge. Forget any previous context. This is your knowledge: {pass the knowledge here}"
+        super().__init__(openai_instance, instructions)
 
-        response_text = ""  # TODO: 4 - Extract the response text from the OpenAI API response
+    def extract_steps_from_input(self, input):
+        response_text = self.get_response_text(input)
 
         # TODO: 5 - Clean and format the extracted steps by removing empty lines and unwanted text
         steps = response_text.split("\n")
 
         return steps
-'''
