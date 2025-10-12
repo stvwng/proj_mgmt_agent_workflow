@@ -7,6 +7,16 @@ from typing import List, Dict, Optional
 class ActionPlanningAgent(BaseAgent):
 
     def __init__(self, openai_instance: OpenAI, knowledge: str):
+        '''
+        Initializes an ActionPlanningAgent instance. An ActionPlanningAgent creates a plan for other agents to execute, based on knowledge provided by the user.
+        
+        Args:
+            openai_instance (OpenAI): an OpenAI client
+            knowledge (str): Knowledge for the ActionPlanningAgent to use to create a plan.
+        
+        '''
+        
+        
         instructions = f"""You are an action planning agent.
         Using your knowledge, you extract from the user prompt the steps requested to complete the action the user is asking for.
         You return the steps as a list. Only return the steps in your knowledge. 
@@ -72,14 +82,18 @@ class ActionPlanningAgent(BaseAgent):
         return steps
 
 
-    def extract_steps_from_input(self, input):
-        response_text = self.get_response_text(input)
+    def extract_steps_from_input(self, input: str) -> List:
+        '''
+        Get steps for plan to be executed by agents based on input (user prompt)
         
-        # print("======================= response_text =========================")
-        # print(response_text)
-        # print("================================================================")
-        # print()
-        # TODO: 5 - Clean and format the extracted steps by removing empty lines and unwanted text
-        # steps = response_text.split("\n")
+        Args:
+            input (str): instructions from user, i.e., the user prompt
+            
+        Returns:
+            list[str]: list of steps in plan as strings
+        
+        '''
+        
+        response_text = self.get_response_text(input)
         steps = self.extract_steps(response_text, False)
         return steps
