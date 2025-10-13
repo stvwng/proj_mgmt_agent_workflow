@@ -1,8 +1,6 @@
 from openai import OpenAI
 from agent_classes.action_planning_agent import ActionPlanningAgent
 
-# agent_classes import ActionPlanningAgent
-
 openai_instance = OpenAI()
 
 knowledge = """
@@ -37,4 +35,7 @@ planning_agent = ActionPlanningAgent(openai_instance, knowledge)
 
 input = "One morning I wanted to have scrambled eggs"
 
-print(planning_agent.extract_steps_from_input(input))
+steps = planning_agent.extract_steps_from_input(input)
+for step in steps:
+    print(step)
+assert(len(steps) == 8)
