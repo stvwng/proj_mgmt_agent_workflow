@@ -21,7 +21,7 @@ class RoutingAgent():
         """
         Fetches the embedding vector for given text using OpenAI's embedding API.
 
-        Parameters:
+        Args:
         text (str): Text to embed.
 
         Returns:
