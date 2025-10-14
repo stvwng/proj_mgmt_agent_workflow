@@ -1,5 +1,6 @@
 from openai import OpenAI
 from .base_agent import BaseAgent
+from typing import Dict
 
 class EvaluationAgent(BaseAgent):
     
@@ -29,7 +30,7 @@ class EvaluationAgent(BaseAgent):
         self.max_interactions = max_interactions
         self.final_response_dict = dict()
 
-    def evaluate(self, initial_input: str) -> dict:
+    def evaluate(self, initial_input: str) -> Dict:
         '''
         Evaluate responses of another agent and provide feedback to improve responses
         

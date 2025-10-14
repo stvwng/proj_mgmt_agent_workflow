@@ -3,6 +3,7 @@ from agents.agent_classes.action_planning_agent import ActionPlanningAgent
 from agents.agent_classes.knowledge_augmented_prompt_agent import KnowledgeAugmentedPromptAgent
 from agents.agent_classes.evaluation_agent import EvaluationAgent
 from agents.agent_classes.routing_agent import RoutingAgent
+from typing import Dict
 
 openai_instance = OpenAI()
 
@@ -115,7 +116,7 @@ def generic_support_function(
     worker_agent: KnowledgeAugmentedPromptAgent,
     eval_agent: EvaluationAgent,
     input: str
-):
+    ) -> Dict:
     '''
     Wrapper function for an EvaluationAgent to evaluate response by another agent
     
