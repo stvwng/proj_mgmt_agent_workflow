@@ -69,6 +69,7 @@ program_manager_knowledge_agent = KnowledgeAugmentedPromptAgent(
                                     name="program_manager",
                                     description="Responsible for defining the features for a product. Groups stories. Does not define development tasks for a product.",
                                     func=lambda: print(f"Replace with support function")) 
+
 # Program Manager - Evaluation Agent
 instructions_program_manager_evaluation_agent = "You are an evaluation agent that checks the answers of other worker agents."
 program_manager_evaluation_criteria =  """The answer should be product features that follow the following structure:  
@@ -113,8 +114,24 @@ dev_engineer_evaluation_agent = EvaluationAgent(
 def generic_support_function(
     worker_agent: KnowledgeAugmentedPromptAgent,
     eval_agent: EvaluationAgent,
-    input: str # step from action plan
+    input: str
 ):
+    '''
+    Wrapper function for an EvaluationAgent to evaluate response by another agent
+    
+    Args:
+    worker_agent (KnowledgeAugmentedPromptAgent): the agent whose response is to be evaluated
+    eval_agent (EvaluationAgent): the EvaluationAgent doing the evaluation
+    input (str): the step from the action plan
+    
+    Returns:
+    dict
+    {
+        "final_response": final response of other agent after all feedback,
+        "evaluation": EvaluationAgent's evaluation of the final response,
+        "num_iterations": number of evaluation-improvement iterations
+    }
+    '''
     worker_response = worker_agent.get_response_text(input)
     final_response_dict = eval_agent.evaluate(worker_response)
     return final_response_dict["final_response"]
@@ -127,6 +144,7 @@ workers2evals = {
 }
 for worker in workers:
     worker.agent_dict["func"] = lambda input: generic_support_function(worker, workers2evals[worker], input)
+
 worker_dicts = [worker.agent_dict for worker in workers]
 routing_agent = RoutingAgent(
                     openai_instance=openai_instance,
