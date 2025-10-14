@@ -3,12 +3,16 @@ from openai import OpenAI
 
 class RoutingAgent():
 
-    def __init__(self, openai_instance: OpenAI, agents: list):
+    def __init__(self, openai_instance: OpenAI, agents: list[dict]):
         # Initialize the agent with given attributes
         self.openai_instance = openai_instance
         self.agents = agents
         '''
-        self.agents is a list of dicts with information about available agents.
+        Instantiate a RoutingAgent instance. RoutingAgent directs prompts to the agent best suited to respond.
+        
+        Args:
+        openai_instance (OpenAI): an OpenAI client
+        agents (list[dict]):  a list of dicts with information about available agents.
         The structure of each dict is:
         {
             "name": str,
@@ -34,7 +38,17 @@ class RoutingAgent():
         )
         return response.data[0].embedding
 
-    def route_prompt(self, user_input: str):
+    def route_prompt(self, user_input: str) -> str:
+        '''
+        Direct prompt to the agent best suited to respond to it.
+        
+        Args:
+        user_input (str): the user prompt
+        
+        Returns:
+        String representing the output of the selected agent's response to the user prompt.
+        
+        '''
         input_emb = self.get_embedding(user_input)
         best_agent = None
         best_score = -1
