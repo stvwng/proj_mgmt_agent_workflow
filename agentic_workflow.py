@@ -47,12 +47,14 @@ product_manager_knowledge_agent = KnowledgeAugmentedPromptAgent(
                                     knowledge=knowledge_product_manager, 
                                     instructions=instructions_product_manager,
                                     name="product_manager",
-                                    description="Responsible for defining product personas and user stories only. Does not define features or tasks. Does not group stories",
+                                    description="""Responsible for defining product personas and user stories only. 
+                                    Does not define features or tasks. Does not group stories""",
                                     func=lambda: print(f"Replace with support function"))
 
 # Product Manager - Evaluation Agent
 instructions_product_manager_evaluation_agent = "You are an evaluation agent that checks the answers of other worker agents"
-product_manager_evaluation_criteria = "The answer should be stories that follow the following structure: As a [type of user], I want [an action or feature] so that [benefit/value]."
+product_manager_evaluation_criteria = """The answer should be stories that follow the following structure: 
+                                        As a [type of user], I want [an action or feature] so that [benefit/value]."""
 product_manager_evaluation_agent = EvaluationAgent(
                                     openai_instance=openai_instance, 
                                     instructions=instructions_product_manager_evaluation_agent, 
@@ -68,7 +70,8 @@ program_manager_knowledge_agent = KnowledgeAugmentedPromptAgent(
                                     knowledge=knowledge_program_manager, 
                                     instructions=instructions_program_manager,
                                     name="program_manager",
-                                    description="Responsible for defining the features for a product. Groups stories. Does not define development tasks for a product.",
+                                    description="""Responsible for defining the features for a product. Groups stories. 
+                                    Does not define development tasks for a product.""",
                                     func=lambda: print(f"Replace with support function")) 
 
 # Program Manager - Evaluation Agent
