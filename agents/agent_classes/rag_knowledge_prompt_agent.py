@@ -6,16 +6,15 @@ import csv
 import uuid
 from datetime import datetime
 from openai import OpenAI
+from typing import List, Dict
 
 class RAGKnowledgePromptAgent:
     """
     An agent that uses Retrieval-Augmented Generation (RAG) to find knowledge from a large corpus
     and leverages embeddings to respond to prompts based solely on retrieved information.
     """
-    
-    # TODO: Refactor to use responses API
 
-    def __init__(self, openai_api_key, persona, chunk_size=2000, chunk_overlap=100):
+    def __init__(self, openai_instance: OpenAI, persona: str, chunk_size: int=2000, chunk_overlap: int=100):
         """
         Initializes the RAGKnowledgePromptAgent with API credentials and configuration settings.
 
@@ -28,28 +27,29 @@ class RAGKnowledgePromptAgent:
         self.persona = persona
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.openai_api_key = openai_api_key
+        self.openai_instance = openai_instance
         self.unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.csv"
 
-    def get_embedding(self, text):
+    def get_embedding(self, text: str, model: str="text-embedding-3-large", encoding_format: str="float") -> List[float]:
         """
         Fetches the embedding vector for given text using OpenAI's embedding API.
 
         Parameters:
         text (str): Text to embed.
+        model (str): OpenAI embedding model to use
+        encoding_format (str): Format of the embeddings
 
         Returns:
         list: The embedding vector.
         """
-        client = OpenAI(base_url="https://openai.vocareum.com/v1", api_key=self.openai_api_key)
-        response = client.embeddings.create(
-            model="text-embedding-3-large",
+        response = self.openai_instance.embeddings.create(
+            model=model,
             input=text,
-            encoding_format="float"
+            encoding_format=encoding_format
         )
         return response.data[0].embedding
 
-    def calculate_similarity(self, vector_one, vector_two):
+    def calculate_similarity(self, vector_one: List[float], vector_two: List[float]) -> float:
         """
         Calculates cosine similarity between two vectors.
 
@@ -63,7 +63,7 @@ class RAGKnowledgePromptAgent:
         vec1, vec2 = np.array(vector_one), np.array(vector_two)
         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
-    def chunk_text(self, text):
+    def chunk_text(self, text: str) -> List[Dict]:
         """
         Splits text into manageable chunks, attempting natural breaks.
 
@@ -105,7 +105,7 @@ class RAGKnowledgePromptAgent:
 
         return chunks
 
-    def calculate_embeddings(self):
+    def calculate_embeddings(self) -> pd.DataFrame:
         """
         Calculates embeddings for each chunk and stores them in a CSV file.
 
@@ -117,7 +117,7 @@ class RAGKnowledgePromptAgent:
         df.to_csv(f"embeddings-{self.unique_filename}", encoding='utf-8', index=False)
         return df
 
-    def find_prompt_in_knowledge(self, prompt):
+    def find_prompt_in_knowledge(self, prompt: str) -> str:
         """
         Finds and responds to a prompt based on similarity with embedded knowledge.
 
