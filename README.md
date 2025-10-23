@@ -1,5 +1,5 @@
 # proj_mgmt_agent_workflow
-Repo for Project Management Agentic AI workflow
+Agentic AI Project Management workflow
 
 This is an AI agentic workflow that manages a technical project.
 
