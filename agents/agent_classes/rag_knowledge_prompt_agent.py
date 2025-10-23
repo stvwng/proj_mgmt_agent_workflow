@@ -134,13 +134,10 @@ class RAGKnowledgePromptAgent:
 
         best_chunk = df.loc[df['similarity'].idxmax(), 'text']
 
-        client = OpenAI(base_url="https://openai.vocareum.com/v1", api_key=self.openai_api_key)
-        response = client.chat.completions.create(
+        response = self.openai_instance.responses.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": f"You are {self.persona}, a knowledge-based assistant. Forget previous context."},
-                {"role": "user", "content": f"Answer based only on this information: {best_chunk}. Prompt: {prompt}"}
-            ],
+            instructions=f"You are {self.persona}, a knowledge-based assistant. Forget previous context.",
+            input=f"Answer based only on this information: {best_chunk}. Prompt: {prompt}",
             temperature=0
         )
 
