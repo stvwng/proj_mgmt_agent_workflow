@@ -117,12 +117,14 @@ class RAGKnowledgePromptAgent:
         df.to_csv(f"embeddings-{self.unique_filename}", encoding='utf-8', index=False)
         return df
 
-    def find_prompt_in_knowledge(self, prompt: str) -> str:
+    def find_prompt_in_knowledge(self, prompt: str, model: str="gpt-3.5-turbo", temperature: float=0.) -> str:
         """
         Finds and responds to a prompt based on similarity with embedded knowledge.
 
         Parameters:
         prompt (str): User input prompt.
+        model (str): OpenAI model
+        temperature (float): temperature for OpenAI model
 
         Returns:
         str: Response derived from the most similar chunk in knowledge.
@@ -133,12 +135,15 @@ class RAGKnowledgePromptAgent:
         df['similarity'] = df['embeddings'].apply(lambda emb: self.calculate_similarity(prompt_embedding, emb))
 
         best_chunk = df.loc[df['similarity'].idxmax(), 'text']
+        
+        if model == "gpt-5":
+            temperature = 0
 
         response = self.openai_instance.responses.create(
-            model="gpt-3.5-turbo",
+            model=model,
             instructions=f"You are {self.persona}, a knowledge-based assistant. Forget previous context.",
             input=f"Answer based only on this information: {best_chunk}. Prompt: {prompt}",
-            temperature=0
+            temperature=temperature
         )
 
         return response.choices[0].message.content
