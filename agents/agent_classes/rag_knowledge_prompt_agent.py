@@ -19,7 +19,7 @@ class RAGKnowledgePromptAgent:
         Initializes the RAGKnowledgePromptAgent with API credentials and configuration settings.
 
         Parameters:
-        openai_api_key (str): API key for accessing OpenAI.
+        openai_instance (OpenAI): OpenAI client
         persona (str): Persona description for the agent.
         chunk_size (int): The size of text chunks for embedding. Defaults to 2000.
         chunk_overlap (int): Overlap between consecutive chunks. Defaults to 100.
@@ -93,9 +93,12 @@ class RAGKnowledgePromptAgent:
                 "start_char": start,
                 "end_char": end
             })
-
-            start = end - self.chunk_overlap
-            chunk_id += 1
+            
+            if end == len(text):
+                break
+            else:
+                start = end - self.chunk_overlap
+                chunk_id += 1
 
         with open(f"chunks-{self.unique_filename}", 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=["text", "chunk_size"])
@@ -139,11 +142,15 @@ class RAGKnowledgePromptAgent:
         if model == "gpt-5":
             temperature = 0
 
-        response = self.openai_instance.responses.create(
-            model=model,
-            instructions=f"You are {self.persona}, a knowledge-based assistant. Forget previous context.",
-            input=f"Answer based only on this information: {best_chunk}. Prompt: {prompt}",
-            temperature=temperature
-        )
+        try:
+            response = self.openai_instance.responses.create(
+                model=model,
+                instructions=f"You are {self.persona}, a knowledge-based assistant. Forget previous context.",
+                input=f"Answer based only on this information: {best_chunk}. Prompt: {prompt}",
+                temperature=temperature
+            )
 
-        return response.choices[0].message.content
+            # return response.choices[0].message.content
+            return response.output_text
+        except Exception as e:
+            return f"Response failed: {e}"
