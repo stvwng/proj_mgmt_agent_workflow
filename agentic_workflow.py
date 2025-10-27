@@ -5,6 +5,8 @@ from agents.agent_classes.evaluation_agent import EvaluationAgent
 from agents.agent_classes.routing_agent import RoutingAgent
 from typing import Dict
 
+# TODO: Modify all KnowledgeAugmentedPromptAgents to be RAGKnowledgePromptAgents
+
 openai_instance = OpenAI()
 
 # Load product spec

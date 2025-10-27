@@ -7,30 +7,44 @@ import uuid
 from datetime import datetime
 from openai import OpenAI
 from typing import List, Dict
+from .base_agent import BaseAgent
 
-class RAGKnowledgePromptAgent:
+# TODO: use chroma for vector db
+
+class RAGKnowledgePromptAgent(BaseAgent):
     """
     An agent that uses Retrieval-Augmented Generation (RAG) to find knowledge from a large corpus
     and leverages embeddings to respond to prompts based solely on retrieved information.
     """
 
-    def __init__(self, openai_instance: OpenAI, persona: str, chunk_size: int=2000, chunk_overlap: int=100):
+    def __init__(
+        self, 
+        openai_instance: OpenAI, 
+        instructions: str, 
+        chunk_size: int=2000, 
+        chunk_overlap: int=100
+        ):
         """
         Initializes the RAGKnowledgePromptAgent with API credentials and configuration settings.
 
         Parameters:
         openai_instance (OpenAI): OpenAI client
-        persona (str): Persona description for the agent.
+        instructions (str): Instructions for the agent, i.e., system prompt.
         chunk_size (int): The size of text chunks for embedding. Defaults to 2000.
         chunk_overlap (int): Overlap between consecutive chunks. Defaults to 100.
         """
-        self.persona = persona
+        super().__init__(openai_instance=openai_instance, instructions=instructions)
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.openai_instance = openai_instance
         self.unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.csv"
 
-    def get_embedding(self, text: str, model: str="text-embedding-3-large", encoding_format: str="float") -> List[float]:
+    def get_embedding(
+        self, 
+        text: str, 
+        model: str="text-embedding-3-large", 
+        encoding_format: str="float"
+        ) -> List[float]:
         """
         Fetches the embedding vector for given text using OpenAI's embedding API.
 
@@ -49,7 +63,11 @@ class RAGKnowledgePromptAgent:
         )
         return response.data[0].embedding
 
-    def calculate_similarity(self, vector_one: List[float], vector_two: List[float]) -> float:
+    def calculate_similarity(
+        self, 
+        vector_one: List[float], 
+        vector_two: List[float]
+        ) -> float:
         """
         Calculates cosine similarity between two vectors.
 
@@ -63,7 +81,10 @@ class RAGKnowledgePromptAgent:
         vec1, vec2 = np.array(vector_one), np.array(vector_two)
         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
-    def chunk_text(self, text: str) -> List[Dict]:
+    def chunk_text(
+        self, 
+        text: str
+        ) -> List[Dict]:
         """
         Splits text into manageable chunks, attempting natural breaks.
 
@@ -120,19 +141,24 @@ class RAGKnowledgePromptAgent:
         df.to_csv(f"embeddings-{self.unique_filename}", encoding='utf-8', index=False)
         return df
 
-    def find_prompt_in_knowledge(self, prompt: str, model: str="gpt-3.5-turbo", temperature: float=0.) -> str:
+    def get_response_text(
+        self, 
+        input: str, 
+        model: str="gpt-3.5-turbo", 
+        temperature: float=0.
+        ) -> str:
         """
         Finds and responds to a prompt based on similarity with embedded knowledge.
 
         Parameters:
-        prompt (str): User input prompt.
+        input (str): User input prompt.
         model (str): OpenAI model
         temperature (float): temperature for OpenAI model
 
         Returns:
         str: Response derived from the most similar chunk in knowledge.
         """
-        prompt_embedding = self.get_embedding(prompt)
+        prompt_embedding = self.get_embedding(input)
         df = pd.read_csv(f"embeddings-{self.unique_filename}", encoding='utf-8')
         df['embeddings'] = df['embeddings'].apply(lambda x: np.array(eval(x)))
         df['similarity'] = df['embeddings'].apply(lambda emb: self.calculate_similarity(prompt_embedding, emb))
@@ -145,8 +171,9 @@ class RAGKnowledgePromptAgent:
         try:
             response = self.openai_instance.responses.create(
                 model=model,
-                instructions=f"You are {self.persona}, a knowledge-based assistant. Forget previous context.",
-                input=f"Answer based only on this information: {best_chunk}. Prompt: {prompt}",
+                # instructions=f"You are {self.persona}, a knowledge-based assistant. Forget previous context.",
+                instructions=self.instructions,
+                input=f"Answer based only on this information: {best_chunk}. Prompt: {input}",
                 temperature=temperature
             )
 
