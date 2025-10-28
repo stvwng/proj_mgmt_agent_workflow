@@ -4,6 +4,7 @@ import pandas as pd
 import re
 import csv
 import uuid
+import os
 from datetime import datetime
 from openai import OpenAI
 from typing import List, Dict
@@ -24,6 +25,7 @@ class RAGKnowledgePromptAgent(BaseAgent):
         openai_instance: OpenAI, 
         instructions: str,
         chromadb_instance:  chromadb.PersistentClient=None,
+        collection_name: str=None,
         chunk_size: int=2000, 
         chunk_overlap: int=100
         ):
@@ -34,6 +36,7 @@ class RAGKnowledgePromptAgent(BaseAgent):
         openai_instance (OpenAI): OpenAI client
         instructions (str): Instructions for the agent, i.e., system prompt.
         chromadb_instance (chromadb.PersistentClient): ChromaDB client for vector search
+        collection_name (str): name of ChromaDB collection
         chunk_size (int): The size of text chunks for embedding. Defaults to 2000.
         chunk_overlap (int): Overlap between consecutive chunks. Defaults to 100.
         """
@@ -42,6 +45,9 @@ class RAGKnowledgePromptAgent(BaseAgent):
         self.chunk_overlap = chunk_overlap
         self.openai_instance = openai_instance
         self.chromadb_instance = chromadb_instance
+        self.embedding_function = embedding_functions.OpenAIEmbeddingFunction(os.getenv("OPENAI_API_KEY"))
+        if chromadb_instance and collection_name:
+            self.collection = self.chromadb_instance.get_or_create_collection(name=collection_name, embedding_function=self.embedding_function)
         self.unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.csv"
 
     def get_embedding(
