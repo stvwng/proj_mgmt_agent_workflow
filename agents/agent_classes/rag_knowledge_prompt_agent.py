@@ -1,4 +1,3 @@
-# TODO: 1 - import the OpenAI class from the openai library
 import numpy as np
 import pandas as pd
 import re
@@ -11,9 +10,6 @@ from typing import List, Dict
 import chromadb
 from chromadb.utils import embedding_functions
 from .base_agent import BaseAgent
-
-# TODO: use chroma for vector db
-
 class RAGKnowledgePromptAgent(BaseAgent):
     """
     An agent that uses Retrieval-Augmented Generation (RAG) to find knowledge from a large corpus
@@ -43,7 +39,6 @@ class RAGKnowledgePromptAgent(BaseAgent):
         super().__init__(openai_instance=openai_instance, instructions=instructions)
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.openai_instance = openai_instance
         self.chromadb_instance = chromadb_instance
         self.embedding_function = embedding_functions.OpenAIEmbeddingFunction(os.getenv("OPENAI_API_KEY"))
         if chromadb_instance and collection_name:
