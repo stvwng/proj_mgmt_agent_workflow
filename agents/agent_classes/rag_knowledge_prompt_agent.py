@@ -7,6 +7,8 @@ import uuid
 from datetime import datetime
 from openai import OpenAI
 from typing import List, Dict
+import chromadb
+from chromadb.utils import embedding_functions
 from .base_agent import BaseAgent
 
 # TODO: use chroma for vector db
@@ -20,7 +22,8 @@ class RAGKnowledgePromptAgent(BaseAgent):
     def __init__(
         self, 
         openai_instance: OpenAI, 
-        instructions: str, 
+        instructions: str,
+        chromadb_instance:  chromadb.PersistentClient=None,
         chunk_size: int=2000, 
         chunk_overlap: int=100
         ):
@@ -30,6 +33,7 @@ class RAGKnowledgePromptAgent(BaseAgent):
         Parameters:
         openai_instance (OpenAI): OpenAI client
         instructions (str): Instructions for the agent, i.e., system prompt.
+        chromadb_instance (chromadb.PersistentClient): ChromaDB client for vector search
         chunk_size (int): The size of text chunks for embedding. Defaults to 2000.
         chunk_overlap (int): Overlap between consecutive chunks. Defaults to 100.
         """
@@ -37,6 +41,7 @@ class RAGKnowledgePromptAgent(BaseAgent):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.openai_instance = openai_instance
+        self.chromadb_instance = chromadb_instance
         self.unique_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.csv"
 
     def get_embedding(
