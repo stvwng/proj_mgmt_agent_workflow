@@ -42,8 +42,35 @@ class RAGAgent(BaseAgent):
             embedding_function=self.embedding_function
             )
         
-    def add_doc_to_collection(self, doc):
-        pass
+    def add_doc_to_collection(self, id: str, doc: str, metadata: Dict=None) -> None:
+        """
+        Wrapper function to add document to collection
+
+        Args:
+            id (str): id of document
+            doc (str): the document to be added to the collection
+            metadata (Dict):  dictonary of metadata for document
+        """
+        self.collection.add(
+            ids=[id],
+            documents=[doc],
+            metadatas=[metadata]
+        )
     
-    def query_collection(self, query:str):
-        pass
+    def query_collection(self, query:str, num_results: int=3) -> Dict:
+        """
+        Wrapper function to query collection
+
+        Args:
+            query (str): The query to be run against the collection
+            num_results (int): number of desired results
+            
+        Returns:
+            Dict with query results, including documents and metadata
+        """
+        
+        return self.collection.query(
+            query_text=[query],
+            n_results=num_results,
+            include=["documents", "metadatas"]
+        )
