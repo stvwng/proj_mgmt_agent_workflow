@@ -69,3 +69,45 @@ class BaseAgent:
             return response.output_text
         except Exception as e:
             print(f"Response failed: {e}")
+            
+    def get_streaming_response(
+        self,
+        input: str,
+        model: str='gpt-3.5-turbo',
+        temperature: float=0
+        ) -> None:
+        '''
+        Makes a call to OpenAI's responses API and prints output text of stream
+        
+        Args:
+        input (str): the user prompt
+        model (str): the OpenAI model to be used
+        temperature (float): value for how creative the response should be; note that this is not available for gpt-5
+        
+        Returns:
+        string representing the output from the OpenAI response
+        '''
+        
+        try:
+            if model in MODELS_WITHOUT_TEMPERATURE:
+                stream = self.openai_instance.responses.create(
+                    model=model,
+                    instructions=self.instructions,
+                    input=input,
+                    stream=True
+                )
+                for event in stream:
+                    print(event)
+            else:
+                stream = self.openai_instance.responses.create(
+                    model=model,
+                    input=input,
+                    instructions=self.instructions,
+                    temperature=temperature,
+                    stream=True
+                )
+                for event in stream:
+                    print(event)
+        except Exception as e:
+            print(f"Response failed: {e}")
+            
